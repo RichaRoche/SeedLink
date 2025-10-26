@@ -4,6 +4,7 @@ import EventCard from "../components/Events/EventCard";
 import Header from "../components/Layout/Header";
 import Loader from "../components/Layout/Loader";
 import Footer from "../components/Layout/Footer";
+import AIButton from "../components/ai/AIButton";
 
 const EventsPage = () => {
   const { allEvents, isLoading } = useSelector((state) => state.events);
@@ -21,6 +22,7 @@ const EventsPage = () => {
           ) : (
             <p>No events available.</p>
           )}
+          <AIButton/>
           <Footer/>
         </div>
       )}

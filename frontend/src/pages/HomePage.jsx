@@ -8,6 +8,7 @@ import Hero from '../components/Route/Hero/Hero';
 // import Sponsored from "../components/Route/Sponsored";
 import Footer from "../components/Layout/Footer";
 import ApplicationSection from '../components/Layout/ApplicationSection';
+import AIButton from '../components/ai/AIButton';
 
 
 const HomePage = () => {
@@ -19,6 +20,7 @@ const HomePage = () => {
             <BestDeals />
             <Events /> */}
             <ApplicationSection/>
+            <AIButton/>
             <Footer />
         </div>
     )

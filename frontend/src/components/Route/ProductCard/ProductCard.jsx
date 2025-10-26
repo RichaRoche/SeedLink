@@ -23,7 +23,7 @@ const ProductCard = ({ data, isEvent }) => {
     const [click, setClick] = useState(false);
     const [open, setOpen] = useState(false);
     const dispatch = useDispatch();
-
+    const { user } = useSelector((state) => state.user);
 
 
     useEffect(() => {

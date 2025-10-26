@@ -6,6 +6,7 @@ import Header from "../components/Layout/Header";
 import Loader from "../components/Layout/Loader";
 import ProductCard from "../components/Route/ProductCard/ProductCard";
 import styles from "../styles/styles";
+import AIButton from "../components/ai/AIButton";
 
 const ProductsPage = () => {
   const [searchParams] = useSearchParams();
@@ -45,6 +46,7 @@ const ProductsPage = () => {
               </h1>
             ) : null}
           </div>
+          <AIButton/>
           <Footer />
         </div>
       )}
