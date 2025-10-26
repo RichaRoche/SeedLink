@@ -79,10 +79,14 @@ router.post(
     try {
       const { activation_token } = req.body;
 
+      console.log("Activation attempt - Token received");
+      
       const newSeller = jwt.verify(
         activation_token,
         process.env.ACTIVATION_SECRET
       );
+
+      console.log("Token verified successfully");
 
       if (!newSeller) {
         return next(new ErrorHandler("Invalid token", 400));
@@ -93,6 +97,7 @@ router.post(
       let seller = await Shop.findOne({ email });
 
       if (seller) {
+        console.log("Seller already exists with email:", email);
         return next(new ErrorHandler("User already exists", 400));
       }
 
@@ -106,8 +111,10 @@ router.post(
         phoneNumber,
       });
 
+      console.log("Seller created successfully:", email);
       sendShopToken(seller, 201, res);
     } catch (error) {
+      console.error("Activation error:", error.message);
       return next(new ErrorHandler(error.message, 500));
     }
   })

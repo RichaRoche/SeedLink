@@ -7,8 +7,7 @@ import { server } from "../../server";
 import { toast } from "react-toastify";
 import { RxAvatar } from 'react-icons/rx';
 
-
-const ShopCreate = () => {
+const ShopCreateForm = () => {
 
     const navigate = useNavigate()
     const [email, setEmail] = useState("");
@@ -20,8 +19,49 @@ const ShopCreate = () => {
     const [password, setPassword] = useState("");
     const [visible, setVisible] = useState(false);
 
+    // Helper function to capitalize first letter of each word
+    const capitalizeName = (text) => {
+        return text.split(' ').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validate required fields
+        if (!name.trim()) {
+            toast.error("Please enter your shop name");
+            return;
+        }
+        if (!email.trim()) {
+            toast.error("Please enter your email address");
+            return;
+        }
+        if (!password.trim()) {
+            toast.error("Please enter a password");
+            return;
+        }
+        if (password.length < 6) {
+            toast.error("Password must be at least 6 characters long");
+            return;
+        }
+        if (!phoneNumber) {
+            toast.error("Please enter your phone number");
+            return;
+        }
+        if (!address.trim()) {
+            toast.error("Please enter your address");
+            return;
+        }
+        if (!zipCode) {
+            toast.error("Please enter your zip code");
+            return;
+        }
+        if (!avatar) {
+            toast.error("Please upload a profile picture");
+            return;
+        }
 
         const config = { headers: { "Content-Type": "multipart/form-data" } };
         // meaning of uper line is that we are creating a new object with the name of config and the value of config is {headers:{'Content-Type':'multipart/form-data'}}  
@@ -30,8 +70,8 @@ const ShopCreate = () => {
         // meaning of uper line is that we are creating a new form data object and we are sending it to the backend with the name of newForm and the value of newForm is new FormData()
         newForm.append("file", avatar);
         // meanin of newForm.append("file",avatar) is that we are sending a file to the backend with the name of file and the value of the file is avatar
-        newForm.append("name", name);
-        newForm.append("email", email);
+        newForm.append("name", capitalizeName(name));
+        newForm.append("email", email.toLowerCase());
         newForm.append("password", password);
         newForm.append("zipCode", zipCode);
         newForm.append("address", address);
@@ -84,15 +124,16 @@ const ShopCreate = () => {
                             <label htmlFor="name"
                                 className='block text-sm font-medium text-gray-700'
                             >
-                                shop name
+                                Shop Name
                             </label>
                             <div className='mt-1'>
                                 <input type="name"
                                     name='name'
                                     required
-
+                                    placeholder='My Awesome Shop'
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
+                                    onBlur={(e) => setName(capitalizeName(e.target.value))}
                                     className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                                 />
                             </div>
@@ -124,7 +165,7 @@ const ShopCreate = () => {
                                 htmlFor="email"
                                 className="block text-sm font-medium text-gray-700"
                             >
-                                Email address
+                                Email Address
                             </label>
                             <div className="mt-1">
                                 <input
@@ -152,8 +193,10 @@ const ShopCreate = () => {
                                     type="address"
                                     name="address"
                                     required
+                                    placeholder='123 Main Street'
                                     value={address}
                                     onChange={(e) => setAddress(e.target.value)}
+                                    onBlur={(e) => setAddress(capitalizeName(e.target.value))}
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 />
                             </div>
@@ -186,7 +229,8 @@ const ShopCreate = () => {
                                 htmlFor="password"
                                 className="block text-sm font-medium text-gray-700"
                             >
-                                Password
+                                Password <span className="text-red-500">*</span>
+                                <span className="text-xs text-gray-500 ml-2">(Minimum 6 characters)</span>
                             </label>
                             <div className="mt-1 relative">
                                 <input
@@ -194,8 +238,10 @@ const ShopCreate = () => {
                                     name="password"
                                     autoComplete="current-password"
                                     required
+                                    minLength={6}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Enter at least 6 characters"
                                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 />
                                 {visible ? (
@@ -240,6 +286,8 @@ const ShopCreate = () => {
                                         type="file"
                                         name="avatar"
                                         id="file-input"
+                                        accept=".jpg,.jpeg,.png"
+                                        required
                                         onChange={handleFileInputChange}
                                         className="sr-only"
                                     />
@@ -273,7 +321,7 @@ const ShopCreate = () => {
     )
 }
 
-export default ShopCreate
+export default ShopCreateForm
 
 
 

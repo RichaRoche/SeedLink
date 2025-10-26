@@ -1,22 +1,23 @@
-import LoginPage from "../pages/LoginPage";
-import SignupPage from "../pages/SignupPage";
-import ActivationPage from "../pages/ActivationPage";
-import HomePage from "../pages/HomePage";
-import ProductsPage from "../pages/ProductsPage";
-// import BestSellingPage from "../pages/BestSellingPage";
-import EventsPage from "../pages/EventsPage";
-import FAQPage from "../pages/FAQPage";
-import CheckoutPage from "../pages/CheckoutPage";
-import PaymentPage from "../pages/PaymentPage";
-import OrderSuccessPage from "../pages/OrderSuccessPage";
-import ProductDetailsPage from "../pages/ProductDetailsPage";
-import ProfilePage from "../pages/ProfilePage";
-import ShopCreatePage from "../pages/ShopCreate";
-import SellerActivationPage from "../pages/SellerActivationPage";
-import ShopLoginPage from "../pages/ShopLoginPage";
-import OrderDetailsPage from "../pages/OrderDetailsPage";
-import TrackOrderPage from "../pages/TrackOrderPage";
-import UserInbox from "../pages/UserInbox";
+import { lazy } from "react";
+
+const LoginPage = lazy(() => import("../pages/LoginPage"));
+const SignupPage = lazy(() => import("../pages/SignupPage"));
+const ActivationPage = lazy(() => import("../pages/ActivationPage"));
+const HomePage = lazy(() => import("../pages/HomePage"));
+const ProductsPage = lazy(() => import("../pages/ProductsPage"));
+const EventsPage = lazy(() => import("../pages/EventsPage"));
+const FAQPage = lazy(() => import("../pages/FAQPage"));
+const CheckoutPage = lazy(() => import("../pages/CheckoutPage"));
+const PaymentPage = lazy(() => import("../pages/PaymentPage"));
+const OrderSuccessPage = lazy(() => import("../pages/OrderSuccessPage"));
+const ProductDetailsPage = lazy(() => import("../pages/ProductDetailsPage"));
+const ProfilePage = lazy(() => import("../pages/ProfilePage"));
+const ShopCreatePage = lazy(() => import("../pages/ShopCreate"));
+const SellerActivationPage = lazy(() => import("../pages/SellerActivationPage"));
+const ShopLoginPage = lazy(() => import("../pages/ShopLoginPage"));
+const OrderDetailsPage = lazy(() => import("../pages/OrderDetailsPage"));
+const TrackOrderPage = lazy(() => import("../pages/TrackOrderPage"));
+const UserInbox = lazy(() => import("../pages/UserInbox"));
 
 export {
   LoginPage,

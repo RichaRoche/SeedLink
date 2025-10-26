@@ -18,10 +18,14 @@ import { addToWishlist, removeFromWishlist } from '../../../redux/actions/wishli
 const ProductDetailsCard = ({ setOpen, data }) => {
     const { cart } = useSelector((state) => state.cart);
     const { wishlist } = useSelector((state) => state.wishlist);
+    const { seller } = useSelector((state) => state.seller);
     const dispatch = useDispatch();
     const [count, setCount] = useState(1)
     const [click, setClick] = useState(false)
     const [select, setSelect] = useState(false)
+    
+    // Check if seller is viewing their own product
+    const isOwnProduct = seller && data && seller._id === data.shop._id;
 
     const handleMessageSubmit = () => {
 
@@ -38,6 +42,10 @@ const ProductDetailsCard = ({ setOpen, data }) => {
 
     // Add to cart
     const addToCartHandler = (id) => {
+        if (isOwnProduct) {
+            toast.error("You cannot add your own product to cart!");
+            return;
+        }
         const isItemExists = cart && cart.find((i) => i._id === id);
 
         if (isItemExists) {
@@ -70,6 +78,10 @@ const ProductDetailsCard = ({ setOpen, data }) => {
 
     // add to wish list
     const addToWishlistHandler = (data) => {
+        if (isOwnProduct) {
+            toast.error("You cannot like your own product!");
+            return;
+        }
         setClick(!click);
         dispatch(addToWishlist(data))
     }

@@ -44,21 +44,22 @@ const DashboardMessages = () => {
 
   useEffect(() => {
     const getConversation = async () => {
+      if (!seller?._id) return; // Guard against missing seller
       try {
-        const resonse = await axios.get(
-          `${server}/conversation/get-all-conversation-seller/${seller?._id}`,
+        const response = await axios.get(
+          `${server}/conversation/get-all-conversation-seller/${seller._id}`,
           {
             withCredentials: true,
           }
         );
 
-        setConversations(resonse.data.conversations);
+        setConversations(response.data.conversations);
       } catch (error) {
-        // console.log(error);
+        console.log("Error fetching conversations:", error);
       }
     };
     getConversation();
-  }, [seller, messages]);
+  }, [seller]);
 
   useEffect(() => {
     if (seller) {

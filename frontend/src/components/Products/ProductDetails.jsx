@@ -24,12 +24,16 @@ const ProductDetails = ({ data }) => {
   const { user, isAuthenticated } = useSelector((state) => state.user);
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cart } = useSelector((state) => state.cart);
+  const { seller } = useSelector((state) => state.seller);
   const dispatch = useDispatch();
 
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
   const navigate = useNavigate();
+  
+  // Check if seller is viewing their own product
+  const isOwnProduct = seller && data && seller._id === data.shop._id;
 
   useEffect(() => {
     dispatch(getAllProductsShop(data && data?.shop._id));
@@ -48,12 +52,20 @@ const ProductDetails = ({ data }) => {
 
   // add to wish list
   const addToWishlistHandler = (data) => {
+    if (isOwnProduct) {
+      toast.error("You cannot like your own product!");
+      return;
+    }
     setClick(!click);
     dispatch(addToWishlist(data));
   };
 
   // Add to cart
   const addToCartHandler = (id) => {
+    if (isOwnProduct) {
+      toast.error("You cannot add your own product to cart!");
+      return;
+    }
     const isItemExists = cart && cart.find((i) => i._id === id);
 
     if (isItemExists) {

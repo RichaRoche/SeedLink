@@ -44,21 +44,22 @@ const UserInbox = () => {
 
   useEffect(() => {
     const getConversation = async () => {
+      if (!user?._id) return; // Guard against missing user
       try {
-        const resonse = await axios.get(
-          `${server}/conversation/get-all-conversation-user/${user?._id}`,
+        const response = await axios.get(
+          `${server}/conversation/get-all-conversation-user/${user._id}`,
           {
             withCredentials: true,
           }
         );
 
-        setConversations(resonse.data.conversations);
+        setConversations(response.data.conversations);
       } catch (error) {
-        // console.log(error);
+        console.log("Error fetching conversations:", error);
       }
     };
     getConversation();
-  }, [user, messages]);
+  }, [user]);
 
   useEffect(() => {
     if (user) {

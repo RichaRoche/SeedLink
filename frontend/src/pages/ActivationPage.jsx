@@ -17,16 +17,17 @@ const ActivationPage = () => {
                         .post(`${server}/user/activation`, {
                             activation_token
                         })
+                    // Success - user will be redirected automatically
                     console.log(res.data.message);
                 } catch (err) {
-                    console.log(err.response.data.message);
+                    console.log("Activation error:", err.response?.data?.message || err.message);
                     setError(true);
                 }
             }
             activationEmail();
         }
 
-    }, []);
+    }, [activation_token]);
 
     return (
         <div
@@ -39,9 +40,15 @@ const ActivationPage = () => {
             }}>
             {
                 error ? (
-                    <p className='text-red-800'>Your token has expired! </p>
+                    <div className='text-center'>
+                        <p className='text-red-800 text-2xl font-bold mb-4'>Your activation link has expired</p>
+                        <p className='text-gray-600'>Please register again to receive a new activation link.</p>
+                    </div>
                 ) : (
-                    <p className='text-green-800'>Your Account has been created sucessfully!</p>
+                    <div className='text-center'>
+                        <p className='text-green-800 text-2xl font-bold mb-4'>Your Account has been created successfully!</p>
+                        <p className='text-gray-600'>You can now log in to your account.</p>
+                    </div>
                 )
             }
 

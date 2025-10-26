@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styles from "../../styles/styles";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { RxAvatar } from "react-icons/rx";
 import axios from "axios";
 import { server } from "../../server";
@@ -18,6 +18,13 @@ const Signup = () => {
 
     // const navigate = useNavigate()
 
+    // Helper function to capitalize first letter of each word
+    const capitalizeName = (text) => {
+        return text.split(' ').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+    };
+
     // fule upload
     const handleFileInputChange = (e) => {
         const file = e.target.files[0];
@@ -26,6 +33,29 @@ const Signup = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        // Validate required fields
+        if (!name.trim()) {
+            toast.error("Please enter your full name");
+            return;
+        }
+        if (!email.trim()) {
+            toast.error("Please enter your email address");
+            return;
+        }
+        if (!password.trim()) {
+            toast.error("Please enter a password");
+            return;
+        }
+        if (password.length < 6) {
+            toast.error("Password must be at least 6 characters long");
+            return;
+        }
+        if (!avatar) {
+            toast.error("Please upload a profile picture");
+            return;
+        }
+        
         const config = { headers: { "Content-Type": "multipart/form-data" } };
         // meaning of uper line is that we are creating a new object with the name of config and the value of config is {headers:{'Content-Type':'multipart/form-data'}}  
 
@@ -33,8 +63,8 @@ const Signup = () => {
         // meaning of uper line is that we are creating a new form data object and we are sending it to the backend with the name of newForm and the value of newForm is new FormData()
         newForm.append("file", avatar);
         // meanin of newForm.append("file",avatar) is that we are sending a file to the backend with the name of file and the value of the file is avatar
-        newForm.append("name", name);
-        newForm.append("email", email);
+        newForm.append("name", capitalizeName(name));
+        newForm.append("email", email.toLowerCase());
         newForm.append("password", password)
 
 
@@ -71,11 +101,12 @@ const Signup = () => {
                             <div className='mt-1'>
                                 <input type="text"
                                     name='text'
-                                    autoComplete='text'
+                                    autoComplete='name'
                                     required
-                                    placeholder='john doe'
+                                    placeholder='John Doe'
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
+                                    onBlur={(e) => setName(capitalizeName(e.target.value))}
                                     className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                                 />
                             </div>
@@ -108,15 +139,18 @@ const Signup = () => {
                             <label htmlFor="password"
                                 className='block text-sm font-medium text-gray-700'
                             >
-                                password
+                                Password <span className="text-red-500">*</span>
+                                <span className="text-xs text-gray-500 ml-2">(Minimum 6 characters)</span>
                             </label>
                             <div className='mt-1 relative'>
                                 <input type={visible ? "text" : "password"}
                                     name='password'
                                     autoComplete='password'
                                     required
+                                    minLength={6}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Enter at least 6 characters"
                                     className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                                 />
                                 {visible ? (
@@ -164,6 +198,7 @@ const Signup = () => {
                                         name='avatar'
                                         id='file-input'
                                         accept=".jpg,.jpeg,.png"
+                                        required
                                         onChange={handleFileInputChange}
                                         className="sr-only"
                                     />

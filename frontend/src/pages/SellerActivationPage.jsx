@@ -7,6 +7,7 @@ import axios from 'axios';
 const SellerActivationPage = () => {
     const { activation_token } = useParams();
     const [error, setError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("Your activation link has expired");
 
     useEffect(() => {
         if (activation_token) {
@@ -16,16 +17,18 @@ const SellerActivationPage = () => {
                         .post(`${server}/shop/activation`, {
                             activation_token
                         })
-
+                    // Success - user will be redirected automatically
                 } catch (err) {
-                    console.log(err.response.data.message);
+                    console.log("Activation error:", err.response?.data?.message || err.message);
+                    const errorMsg = err.response?.data?.message || "Your activation link has expired";
+                    setErrorMessage(errorMsg);
                     setError(true);
                 }
             }
             activationEmail();
         }
 
-    }, []);
+    }, [activation_token]);
 
     return (
         <div
@@ -38,9 +41,16 @@ const SellerActivationPage = () => {
             }}>
             {
                 error ? (
-                    <p className='text-red-800'>Your toke is expair </p>
+                    <div className='text-center'>
+                        <p className='text-red-800 text-2xl font-bold mb-4'>Activation Failed</p>
+                        <p className='text-red-600 mb-4'>{errorMessage}</p>
+                        <p className='text-gray-600'>Please register again to receive a new activation link.</p>
+                    </div>
                 ) : (
-                    <p className='text-green-800'>Your Account has been created sucess fully!</p>
+                    <div className='text-center'>
+                        <p className='text-green-800 text-2xl font-bold mb-4'>Your Seller Account has been created successfully!</p>
+                        <p className='text-gray-600'>You can now log in to your seller dashboard.</p>
+                    </div>
                 )
             }
 

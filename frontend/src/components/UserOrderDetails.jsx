@@ -260,7 +260,7 @@ const UserOrderDetails = () => {
       </div>
       <br />
 
-      <Link to="/">
+      <Link to="/inbox">
         <div className={`${styles.button} text-white`}>Send Message</div>
       </Link>
       <br />
