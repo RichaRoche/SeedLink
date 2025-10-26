@@ -13,10 +13,11 @@ import { TbAddressBook } from "react-icons/tb";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 const ProfileSidebar = ({ active, setActive }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { user } = useSelector((state) => state.user);
 
@@ -24,6 +25,10 @@ const ProfileSidebar = ({ active, setActive }) => {
     axios
       .get(`${server}/user/logout-user`, { withCredentials: true })
       .then((res) => {
+        localStorage.removeItem("cartItems");
+        localStorage.removeItem("wishlistItems");
+        dispatch({ type: "clearCart" });
+        dispatch({ type: "clearWishlist" });
         toast.success(res.data.message);
         window.location.reload(true);
         navigate("/login");

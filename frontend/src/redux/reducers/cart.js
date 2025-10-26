@@ -28,5 +28,11 @@ export const cartReducer = createReducer(initialState, (builder) => {
         ...state,
         cart: state.cart.filter((i) => i._id !== action.payload),
       };
+    })
+    .addCase("clearCart", (state) => {
+      return {
+        ...state,
+        cart: [],
+      };
     });
 });

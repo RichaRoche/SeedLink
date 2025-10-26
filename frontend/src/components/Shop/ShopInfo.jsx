@@ -40,12 +40,15 @@ const ShopInfo = ({ isOwner }) => {
             withCredentials: true,
         });
 
-        // 🔥 Update Redux state
+        localStorage.removeItem("cartItems");
+        localStorage.removeItem("wishlistItems");
+        dispatch({ type: "clearCart" });
+        dispatch({ type: "clearWishlist" });
+
         dispatch({
             type: "SellerLogoutSuccess",
         });
 
-        // ✅ Go to home page
         window.location.href = "/";
         } catch (error) {
             console.log(error);
