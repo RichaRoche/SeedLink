@@ -19,15 +19,34 @@ import { RxCross1 } from "react-icons/rx";
 const Payment = () => {
     const [orderData, setOrderData] = useState([]);
     const [open, setOpen] = useState(false);
+    const [isValidOrder, setIsValidOrder] = useState(false);
     const { user } = useSelector((state) => state.user);
     const navigate = useNavigate();
     const stripe = useStripe();
     const elements = useElements();
 
     useEffect(() => {
-        const orderData = JSON.parse(localStorage.getItem("latestOrder")) || {};
-        setOrderData(orderData);
-    }, []);
+        try {
+            const storedOrder = localStorage.getItem("latestOrder");
+            if (storedOrder) {
+                const orderData = JSON.parse(storedOrder);
+                if (orderData && orderData.cart && orderData.cart.length > 0) {
+                    setOrderData(orderData);
+                    setIsValidOrder(true);
+                } else {
+                    toast.error("Invalid order data. Please complete checkout.");
+                    setTimeout(() => navigate("/checkout"), 2000);
+                }
+            } else {
+                toast.error("No order data found. Please complete checkout.");
+                setTimeout(() => navigate("/checkout"), 2000);
+            }
+        } catch (error) {
+            console.error("Error parsing order data:", error);
+            toast.error("Invalid order data. Please try again.");
+            setTimeout(() => navigate("/checkout"), 2000);
+        }
+    }, [navigate]);
 
     // Pay-pal
     const createOrder = (data, actions) => {
@@ -53,47 +72,62 @@ const Payment = () => {
     };
 
     const order = {
-        cart: orderData?.cart,
-        shippingAddress: orderData?.shippingAddress,
+        cart: orderData?.cart || [],
+        shippingAddress: orderData?.shippingAddress || {},
         user: user && user,
-        totalPrice: orderData?.totalPrice,
+        totalPrice: orderData?.totalPrice || 0,
     };
 
+    // Early return if invalid order
+    if (!isValidOrder) {
+        return (
+            <div className="w-full flex items-center justify-center py-20">
+                <div className="text-center">
+                    <h2 className="text-2xl font-semibold mb-4">Loading order data...</h2>
+                    <p className="text-gray-600">Please wait while we load your order.</p>
+                </div>
+            </div>
+        );
+    }
+
     const onApprove = async (data, actions) => {
-        return actions.order.capture().then(function (details) {
+        try {
+            const details = await actions.order.capture();
             const { payer } = details;
 
-            let paymentInfo = payer;
-
-            if (paymentInfo !== undefined) {
-                paypalPaymentHandler(paymentInfo);
+            if (payer) {
+                await paypalPaymentHandler(payer);
             }
-        });
+        } catch (error) {
+            console.error("PayPal approval error:", error);
+            toast.error("PayPal payment failed. Please try again.");
+        }
     };
 
     const paypalPaymentHandler = async (paymentInfo) => {
-        const config = {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        };
-        order.paymentInfo = {
-            id: paymentInfo.payer_id,
-            status: "succeeded",
-            type: "Paypal",
-        };
+        try {
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            };
+            order.paymentInfo = {
+                id: paymentInfo.payer_id,
+                status: "succeeded",
+                type: "Paypal",
+            };
 
-        await axios
-            .post(`${server}/order/create-order`, order, config)
-            .then((res) => {
-                setOpen(false);
-                navigate("/order/success");
-                toast.success("Order successful!");
-                localStorage.setItem("cartItems", JSON.stringify([]));
-                localStorage.setItem("latestOrder", JSON.stringify([]));
-                window.location.reload();
-            });
-
+            await axios.post(`${server}/order/create-order`, order, config);
+            
+            setOpen(false);
+            navigate("/order/success");
+            toast.success("Order successful!");
+            localStorage.setItem("cartItems", JSON.stringify([]));
+            localStorage.setItem("latestOrder", JSON.stringify([]));
+        } catch (error) {
+            console.error("PayPal payment handler error:", error);
+            toast.error(error.response?.data?.message || "Failed to process PayPal payment");
+        }
     }
 
     const paymentData = {
@@ -136,72 +170,82 @@ const Payment = () => {
                         type: "Credit Card",
                     };
 
-                    await axios
-                        .post(`${server}/order/create-order`, order, config)
-                        .then((res) => {
-                            setOpen(false);
-                            navigate("/order/success");
-                            toast.success("Order successful!");
-                            localStorage.setItem("cartItems", JSON.stringify([]));
-                            localStorage.setItem("latestOrder", JSON.stringify([]));
-                            window.location.reload();
-                        });
+                    await axios.post(`${server}/order/create-order`, order, config);
+                    
+                    navigate("/order/success");
+                    toast.success("Order successful!");
+                    localStorage.setItem("cartItems", JSON.stringify([]));
+                    localStorage.setItem("latestOrder", JSON.stringify([]));
                 }
             }
         } catch (error) {
-            toast.error(error);
+            console.error("Payment handler error:", error);
+            toast.error(error.response?.data?.message || error.message || "Payment failed. Please try again.");
         }
     };
 
 
-    //  Cash on Delevery Handler (COD)
+    //  Cash on Delivery Handler (COD)
     const cashOnDeliveryHandler = async (e) => {
         e.preventDefault();
 
-        const config = {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        };
+        try {
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            };
 
-        order.paymentInfo = {
-            type: "Cash On Delivery",
-        };
+            order.paymentInfo = {
+                type: "Cash On Delivery",
+            };
 
-        await axios
-            .post(`${server}/order/create-order`, order, config)
-            .then((res) => {
-                setOpen(false);
-                navigate("/order/success");
-                toast.success("Order successful!");
-                localStorage.setItem("cartItems", JSON.stringify([]));
-                localStorage.setItem("latestOrder", JSON.stringify([]));
-                window.location.reload();
-            });
+            await axios.post(`${server}/order/create-order`, order, config);
+            
+            navigate("/order/success");
+            toast.success("Order successful!");
+            localStorage.setItem("cartItems", JSON.stringify([]));
+            localStorage.setItem("latestOrder", JSON.stringify([]));
+        } catch (error) {
+            console.error("Cash on delivery error:", error);
+            toast.error(error.response?.data?.message || "Failed to create order");
+        }
     }
 
 
     return (
         <div className="w-full flex flex-col items-center py-8">
-            <div className="w-[90%] 1000px:w-[70%] block 800px:flex">
-                <div className="w-full 800px:w-[65%]">
-                    <PaymentInfo
-                        user={user}
-                        open={open}
-                        setOpen={setOpen}
-                        onApprove={onApprove}
-                        createOrder={createOrder}
-                        paymentHandler={paymentHandler}
-                        cashOnDeliveryHandler={cashOnDeliveryHandler}
-
-                    />
+            {isValidOrder && orderData && orderData.cart ? (
+                <div className="w-[90%] 1000px:w-[70%] block 800px:flex">
+                    <div className="w-full 800px:w-[65%]">
+                        <PaymentInfo
+                            user={user}
+                            open={open}
+                            setOpen={setOpen}
+                            onApprove={onApprove}
+                            createOrder={createOrder}
+                            paymentHandler={paymentHandler}
+                            cashOnDeliveryHandler={cashOnDeliveryHandler}
+                        />
+                    </div>
+                    <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
+                        <CartData orderData={orderData} />
+                    </div>
                 </div>
-                <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
-                    <CartData
-                        orderData={orderData}
-                    />
+            ) : (
+                <div className="w-full flex items-center justify-center py-20">
+                    <div className="text-center">
+                        <h2 className="text-2xl font-semibold mb-4">Invalid Order</h2>
+                        <p className="text-gray-600 mb-4">Please complete checkout first.</p>
+                        <button 
+                            onClick={() => navigate("/checkout")}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                            Go to Checkout
+                        </button>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
@@ -375,6 +419,14 @@ const PaymentInfo = ({
                                                 style={{ layout: "vertical" }}
                                                 onApprove={onApprove}
                                                 createOrder={createOrder}
+                                                onCancel={() => {
+                                                    console.log("PayPal payment cancelled");
+                                                    toast.info("PayPal payment cancelled");
+                                                }}
+                                                onError={(err) => {
+                                                    console.error("PayPal error:", err);
+                                                    toast.error("PayPal payment error. Please try again.");
+                                                }}
                                             />
                                         </PayPalScriptProvider>
                                     </div>
