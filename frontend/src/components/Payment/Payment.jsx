@@ -8,17 +8,14 @@ import {
     useStripe,
     useElements,
 } from "@stripe/react-stripe-js";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
-import { RxCross1 } from "react-icons/rx";
 
 
 const Payment = () => {
     const [orderData, setOrderData] = useState([]);
-    const [open, setOpen] = useState(false);
     const [isValidOrder, setIsValidOrder] = useState(false);
     const { user } = useSelector((state) => state.user);
     const navigate = useNavigate();
@@ -48,29 +45,6 @@ const Payment = () => {
         }
     }, [navigate]);
 
-    // Pay-pal
-    const createOrder = (data, actions) => {
-        return actions.order
-            .create({
-                purchase_units: [
-                    {
-                        description: "Sunflower",
-                        amount: {
-                            currency_code: "INR",
-                            value: orderData?.totalPrice,
-                        },
-                    },
-                ],
-                // not needed if a shipping address is actually needed
-                application_context: {
-                    shipping_preference: "NO_SHIPPING",
-                },
-            })
-            .then((orderID) => {
-                return orderID;
-            });
-    };
-
     const order = {
         cart: orderData?.cart || [],
         shippingAddress: orderData?.shippingAddress || {},
@@ -88,46 +62,6 @@ const Payment = () => {
                 </div>
             </div>
         );
-    }
-
-    const onApprove = async (data, actions) => {
-        try {
-            const details = await actions.order.capture();
-            const { payer } = details;
-
-            if (payer) {
-                await paypalPaymentHandler(payer);
-            }
-        } catch (error) {
-            console.error("PayPal approval error:", error);
-            toast.error("PayPal payment failed. Please try again.");
-        }
-    };
-
-    const paypalPaymentHandler = async (paymentInfo) => {
-        try {
-            const config = {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            };
-            order.paymentInfo = {
-                id: paymentInfo.payer_id,
-                status: "succeeded",
-                type: "Paypal",
-            };
-
-            await axios.post(`${server}/order/create-order`, order, config);
-            
-            setOpen(false);
-            navigate("/order/success");
-            toast.success("Order successful!");
-            localStorage.setItem("cartItems", JSON.stringify([]));
-            localStorage.setItem("latestOrder", JSON.stringify([]));
-        } catch (error) {
-            console.error("PayPal payment handler error:", error);
-            toast.error(error.response?.data?.message || "Failed to process PayPal payment");
-        }
     }
 
     const paymentData = {
@@ -220,10 +154,6 @@ const Payment = () => {
                     <div className="w-full 800px:w-[65%]">
                         <PaymentInfo
                             user={user}
-                            open={open}
-                            setOpen={setOpen}
-                            onApprove={onApprove}
-                            createOrder={createOrder}
                             paymentHandler={paymentHandler}
                             cashOnDeliveryHandler={cashOnDeliveryHandler}
                         />
@@ -252,10 +182,6 @@ const Payment = () => {
 
 const PaymentInfo = ({
     user,
-    open,
-    setOpen,
-    onApprove,
-    createOrder,
     paymentHandler,
     cashOnDeliveryHandler,
 }) => {
@@ -368,72 +294,6 @@ const PaymentInfo = ({
                                 className={`${styles.button} !bg-[#f63b60] text-[#fff] h-[45px] rounded-[5px] cursor-pointer text-[18px] font-[600]`}
                             />
                         </form>
-                    </div>
-                ) : null}
-            </div>
-
-            <br />
-            {/* paypal payment */}
-            <div>
-                <div className="flex w-full pb-5 border-b mb-2">
-                    <div
-                        className="w-[25px] h-[25px] rounded-full bg-transparent border-[3px] border-[#1d1a1ab4] relative flex items-center justify-center"
-                        onClick={() => setSelect(2)}
-                    >
-                        {select === 2 ? (
-                            <div className="w-[13px] h-[13px] bg-[#1d1a1acb] rounded-full" />
-                        ) : null}
-                    </div>
-                    <h4 className="text-[18px] pl-2 font-[600] text-[#000000b1]">
-                        Pay with Paypal
-                    </h4>
-                </div>
-
-                {/* pay with payment  */}
-                {select === 2 ? (
-                    <div className="w-full flex border-b">
-                        <div
-                            className={`${styles.button} !bg-[#f63b60] text-white h-[45px] rounded-[5px] cursor-pointer text-[18px] font-[600]`}
-                            onClick={() => setOpen(true)}
-                        >
-                            pay Now
-                        </div>
-                        {
-                            open && (
-                                <div className="w-full fixed top-0 left-0 bg-[#00000039] h-screen flex items-center justify-center z-[99999]">
-                                    <div className="w-full 800px:w-[40%] h-screen 800px:h-[80vh] bg-white rounded-[5px] shadow flex flex-col justify-center p-8 relative overflow-y-scroll">
-                                        <div className="w-full flex justify-end p-3">
-                                            <RxCross1
-                                                size={30}
-                                                className="cursor-pointer absolute top-5 right-3"
-                                                onClick={() => setOpen(false)}
-                                            />
-                                        </div>
-                                        <PayPalScriptProvider
-                                            options={{
-                                                "client-id":
-                                                    "AXRhO4eNGo3L8MUFazEFnW9hNwBP2rTwUWNqMMRcFtjpbCrDVt6vS8HoWa7hyLlfO0fxG3OU_9zit7KN",
-                                            }}
-                                        >
-                                            <PayPalButtons
-                                                style={{ layout: "vertical" }}
-                                                onApprove={onApprove}
-                                                createOrder={createOrder}
-                                                onCancel={() => {
-                                                    console.log("PayPal payment cancelled");
-                                                    toast.info("PayPal payment cancelled");
-                                                }}
-                                                onError={(err) => {
-                                                    console.error("PayPal error:", err);
-                                                    toast.error("PayPal payment error. Please try again.");
-                                                }}
-                                            />
-                                        </PayPalScriptProvider>
-                                    </div>
-                                </div>
-                            )
-                        }
-
                     </div>
                 ) : null}
             </div>
