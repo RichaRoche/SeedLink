@@ -13,7 +13,7 @@
 - `cd backend`
 - `yarn install`
 - create folder `uploads`
-- create `confilg` folder and a `.env` file
+- create `config` folder and a `.env` file
 - use your Cradincial in.env file
 
 ```
@@ -41,9 +41,8 @@ PORT = 4000
 ```
 - `yarn start`
 
+To access admin dashboard ,create a normal user and make its role Admin
+
 <br/>
 <p align="center"><a href="https://github.com/pattjoshi/Multi_vondor_E_shop#"><img src="http://randojs.com/images/backToTopButtonTransparentBackground.png" alt="Back to top" height="29"/></a></p>
 
-
-@copyright by Om Pattjoshi 2023
-# SeedLink
