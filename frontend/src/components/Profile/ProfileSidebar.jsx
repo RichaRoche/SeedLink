@@ -78,8 +78,11 @@ const ProfileSidebar = ({ active, setActive }) => {
       </div>
 
       <div
-        className="flex items-center cursor-pointer w-full mb-8"
-        onClick={() => setActive(4) || navigate("/inbox")}
+          className="flex items-center cursor-pointer w-full mb-8"
+          onClick={() =>{
+            setActive(4);
+            navigate("/inbox");
+          }}
       >
         <AiOutlineMessage size={20} color={active === 4 ? "red" : ""} />
         <span
@@ -87,7 +90,7 @@ const ProfileSidebar = ({ active, setActive }) => {
             active === 4 ? "text-[red]" : ""
           } 800px:block hidden`}
         >
-          inbox
+          Inbox
         </span>
       </div>
 

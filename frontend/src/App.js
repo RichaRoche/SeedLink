@@ -67,10 +67,20 @@ import { loadStripe } from "@stripe/stripe-js";
 const App = () => {
   const [stripeApikey, setStripeApiKey] = useState("");
 
+  // async function getStripeApikey() {
+  //   const { data } = await axios.get(`${server}/payment/stripeapikey`);
+  //   setStripeApiKey(data.stripeApikey);
+  // }
+
   async function getStripeApikey() {
+  try {
     const { data } = await axios.get(`${server}/payment/stripeapikey`);
+    console.log("Stripe API key:", data.stripeApikey); // <-- check here
     setStripeApiKey(data.stripeApikey);
+  } catch (error) {
+    console.error("Error fetching Stripe API key:", error);
   }
+}
 
   useEffect(() => {
     Store.dispatch(loadUser());
@@ -82,7 +92,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      {stripeApikey && (
+      {/* {stripeApikey && (
         <Elements stripe={loadStripe(stripeApikey)}>
           <Routes>
             <Route
@@ -95,9 +105,23 @@ const App = () => {
             />
           </Routes>
         </Elements>
-      )}
+      )} */}
 
       <Routes>
+        <Route
+          path="/payment"element={
+              <ProtectedRoute>
+                {stripeApikey ? (
+                  <Elements stripe={loadStripe(stripeApikey)}>
+                  <PaymentPage />
+                  </Elements>
+                ) : (
+                  <div>Loading...</div>
+                )}
+              </ProtectedRoute>
+          }
+      />
+
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignupPage />} />

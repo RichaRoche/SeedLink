@@ -46,11 +46,12 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 // bodyparser is used to parse the data from the body of the request to the server (POST, PUT, DELETE, etc.)
 
 // config
-if (process.env.NODE_ENV !== "PRODUCTION") {
-  require("dotenv").config({
-    path: "config/.env",
-  });
-}
+// if (process.env.NODE_ENV !== "PRODUCTION") {
+//   require("dotenv").config({
+//     path: "config/.env",
+//   });
+// }
+
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

@@ -7,6 +7,7 @@ import Hero from '../components/Route/Hero/Hero';
 // import FeaturedProduct from "../components/Route/FeaturedProduct/FeaturedProduct";
 // import Sponsored from "../components/Route/Sponsored";
 import Footer from "../components/Layout/Footer";
+import ApplicationSection from '../components/Layout/ApplicationSection';
 
 
 const HomePage = () => {
@@ -17,6 +18,7 @@ const HomePage = () => {
             {/* <Categories />
             <BestDeals />
             <Events /> */}
+            <ApplicationSection/>
             <Footer />
         </div>
     )

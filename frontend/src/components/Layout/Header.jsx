@@ -124,7 +124,7 @@ const Header = ({ activeHeading }) => {
       {/*  2nd part of header start */}
       <div
         className={`${
-          active == true ? "shadow-sm fixed top-0 left-0 z-10" : null
+          active == true ? "shadow-sm fixed top-0 left-0 z-50" : null
         } transition hidden 800px:flex items-center justify-between w-full bg-[#EEC044] h-[70px]`}
       >
         <div
