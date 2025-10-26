@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import "./App.css";
 import Store from "./redux/store";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -92,21 +92,11 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      {/* {stripeApikey && (
-        <Elements stripe={loadStripe(stripeApikey)}>
-          <Routes>
-            <Route
-              path="/payment"
-              element={
-                <ProtectedRoute>
-                  <PaymentPage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Elements>
-      )} */}
-
+      <Suspense fallback={
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      }>
       <Routes>
         <Route
           path="/payment"element={
@@ -360,6 +350,7 @@ const App = () => {
           }
         />
       </Routes>
+      </Suspense>
       <ToastContainer
         position="bottom-center"
         autoClose={5000}
