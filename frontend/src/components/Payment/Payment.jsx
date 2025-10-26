@@ -8,7 +8,7 @@ import {
     useStripe,
     useElements,
 } from "@stripe/react-stripe-js";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
@@ -21,6 +21,7 @@ const Payment = () => {
     const navigate = useNavigate();
     const stripe = useStripe();
     const elements = useElements();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         try {
@@ -106,10 +107,13 @@ const Payment = () => {
 
                     await axios.post(`${server}/order/create-order`, order, config);
                     
-                    navigate("/order/success");
-                    toast.success("Order successful!");
+                    // Clear cart from Redux and localStorage
+                    dispatch({ type: "clearCart" });
                     localStorage.setItem("cartItems", JSON.stringify([]));
                     localStorage.setItem("latestOrder", JSON.stringify([]));
+                    
+                    navigate("/order/success");
+                    toast.success("Order successful!");
                 }
             }
         } catch (error) {
@@ -136,10 +140,13 @@ const Payment = () => {
 
             await axios.post(`${server}/order/create-order`, order, config);
             
-            navigate("/order/success");
-            toast.success("Order successful!");
+            // Clear cart from Redux and localStorage
+            dispatch({ type: "clearCart" });
             localStorage.setItem("cartItems", JSON.stringify([]));
             localStorage.setItem("latestOrder", JSON.stringify([]));
+            
+            navigate("/order/success");
+            toast.success("Order successful!");
         } catch (error) {
             console.error("Cash on delivery error:", error);
             toast.error(error.response?.data?.message || "Failed to create order");
