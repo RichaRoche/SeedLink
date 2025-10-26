@@ -41,10 +41,12 @@ model.fc = nn.Sequential(
 )
 
 checkpoint = torch.load(MODEL_PATH, map_location=device, weights_only=False)
-if 'model_state_dict' in checkpoint:
+if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
     model.load_state_dict(checkpoint['model_state_dict'])
-else:
+elif isinstance(checkpoint, dict):
     model.load_state_dict(checkpoint)
+else:
+    model = checkpoint
 
 model = model.to(device)
 model.eval()
