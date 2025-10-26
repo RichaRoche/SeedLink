@@ -23,24 +23,28 @@ const ShopSettings = () => {
     const handleImage = async (e) => {
         e.preventDefault();
         const file = e.target.files[0];
+        if (!file) return;
+
         setAvatar(file);
 
         const formData = new FormData();
+        formData.append("image", file);
 
-        formData.append("image", e.target.files[0]);
-
-        await axios.put(`${server}/shop/update-shop-avatar`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-            withCredentials: true,
-        }).then((res) => {
+        try {
+            const res = await axios.put(`${server}/shop/update-shop-avatar`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            });
+            
             dispatch(loadSeller());
-            toast.success("Avatar updated successfully!")
-        }).catch((error) => {
-            toast.error(error.response.data.message);
-        })
-
+            setAvatar(null);
+            toast.success("Avatar updated successfully!");
+        } catch (error) {
+            setAvatar(null);
+            toast.error(error.response?.data?.message || "Failed to update avatar");
+        }
     };
 
     const updateHandler = async (e) => {
@@ -69,10 +73,11 @@ const ShopSettings = () => {
                     <div className="relative">
                         <img
                             src={
-                                avatar ? URL.createObjectURL(avatar) : `${backend_url}/${seller.avatar}`
+                                avatar ? URL.createObjectURL(avatar) : `${backend_url}${seller.avatar}`
                             }
                             alt=""
                             className="w-[200px] h-[200px] rounded-full cursor-pointer"
+                            key={seller?.avatar}
                         />
                         <div className="w-[30px] h-[30px] bg-[#E3E9EE] rounded-full flex items-center justify-center cursor-pointer absolute bottom-[10px] right-[15px]">
                             <input
