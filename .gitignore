@@ -45,21 +45,6 @@ backend/delete-old-seller.js
 backend/create-admin.js
 
 # AI Model files
-SeedLink-airecognition-main/venv
-SeedLink-airecognition-main/__pycache__
-SeedLink-airecognition-main/*.pyc
-SeedLink-airecognition-main/start-ai.ps1
-SeedLink-airecognition-main/start-ai.sh
-SeedLink-airecognition-main/uploads/
-SeedLink-airecognition-main/*.pth
-SeedLink-airecognition-main/*.pkl
-SeedLink-airecognition-main/*.ipynb
-SeedLink-airecognition-main/*.png
-SeedLink-airecognition-main/*.txt
-SeedLink-airecognition-main/*.json
-SeedLink-airecognition-main/Agricultural-crops/
-SeedLink-airecognition-main/Agricultural-crops-split/
-SeedLink-airecognition-main/checkpoints/
 
 # Documentation files
 SETUP_LOCAL.md
@@ -73,4 +58,3 @@ YOUR_ADMIN_CREDENTIALS.txt
 STEP_BY_STEP_FIX.md
 RESTART_BACKEND_NOW.md
 ADMIN_ACCESS.md
-SeedLink-airecognition-main/

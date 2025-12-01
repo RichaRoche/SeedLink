@@ -69,7 +69,7 @@ const createActivationToken = (user) => {
   // why use create activatetoken?
   // to create a token for the user to activate their account  after they register
   return jwt.sign(user, process.env.ACTIVATION_SECRET, {
-    expiresIn: "5m",
+    expiresIn: "24h",
   });
 };
 
